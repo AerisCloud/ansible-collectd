@@ -1,0 +1,5 @@
+monitor_coretemp: false
+collectd_forward_to_logstash: false
+
+use_librato: false
+use_graphite: false

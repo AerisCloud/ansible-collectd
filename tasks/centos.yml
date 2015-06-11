@@ -1,0 +1,49 @@
+- name: "Set collectd's config file destination"
+  set_fact: >
+    collectd_config_dest=/etc/collectd.conf
+  tags:
+    - collectd
+
+- name: "Clean old packages"
+  yum: >
+    name={{ item }}
+    state=absent
+  with_items:
+    - collectd-python
+    - collectd-hddtemp
+    - libcollectdclient
+  tags:
+    - collectd
+    - pkgs
+
+- name: "Install Ghettoforge repo"
+  yum: >
+    name=http://mirror.symnds.com/distributions/gf/el/6/gf/x86_64/gf-release-6-8.gf.el6.noarch.rpm
+    state=present
+  when: ansible_distribution_major_version|int == 6
+  tags:
+    - collectd
+    - pkgs
+    - repos
+
+- name: "Install required packages"
+  yum : >
+    name={{ item }}
+    enablerepo=epel,gf-plus
+    state=latest
+  with_items: packages
+  when: ansible_distribution_major_version|int == 6
+  tags:
+    - collectd
+    - pkgs
+
+- name: "Install required packages"
+  yum : >
+    name={{ item }}
+    enablerepo=epel
+    state=latest
+  with_items: packages
+  when: ansible_distribution_major_version|int > 6
+  tags:
+    - collectd
+    - pkgs

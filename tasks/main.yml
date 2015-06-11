@@ -1,0 +1,91 @@
+- include: centos.yml
+  when: ansible_distribution == "CentOS"
+
+- include: debian.yml
+  when: ansible_distribution == "Debian"
+
+#####################
+# Common
+- name: "Install Librato backend"
+  git: >
+    repo=https://github.com/librato/collectd-librato.git
+    version=v0.0.8
+    dest=/opt/collectd-librato/
+  tags:
+    - collectd
+    - pkgs
+    - libs
+
+- name: "Ensure the collectd python and exec module directory exists"
+  file: >
+    path=/opt/collectd-{{ item }}-modules
+    state=directory
+  with_items:
+    - python
+    - exec
+  tags:
+    - collectd
+    - pkgs
+    - libs
+
+- name: "Symlink the librato module into the python module directory"
+  file: >
+    src=/opt/collectd-librato/lib/collectd-librato.py
+    dest=/opt/collectd-python-modules/collectd-librato.py
+    state=link
+  tags:
+    - collectd
+    - libs
+
+- name: "Install coretemp plugin for collectd"
+  copy: >
+    src=collectd-coretemp.sh
+    dest=/opt/collectd-exec-modules/
+    mode=0755
+    owner=root
+    group=root
+  notify:
+    - Restart collectd
+  tags:
+    - collectd
+    - files
+
+- name: "Install /etc/collectd.conf"
+  template: >
+    src=collectd.conf.j2
+    dest={{ collectd_config_dest }}
+    mode=0644
+  notify:
+    - Restart collectd
+  tags:
+    - collectd
+    - files
+    - configs
+
+- name: "Make sure /etc/collectd.d is present"
+  file: >
+    path=/etc/collectd.d
+    state=directory
+  tags:
+    - collectd
+    - files
+    - configs
+
+- name: "Add the coretemp kernel module"
+  modprobe: >
+    name=coretemp
+    state=present
+  when: monitor_coretemp
+  tags:
+    - collectd
+    - files
+    - configs
+
+- name: "Make sure collectd is running"
+  service: >
+    name=collectd
+    state=running
+    enabled=yes
+    runlevel=5
+  tags:
+    - collectd

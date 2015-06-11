@@ -1,0 +1,19 @@
+- name: "Set collectd's config file destination"
+  set_fact: >
+    collectd_config_dest=/etc/collectd/collectd.conf
+  tags:
+    - collectd
+
+- name: "Install required packages"
+  apt : >
+    name={{ item }}
+    state=latest
+  with_items:
+    - git
+    - collectd
+    - collectd-core
+    - collectd-utils
+  tags:
+    - install
+    - collectd
+    - pkgs

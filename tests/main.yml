@@ -1,0 +1,8 @@
+---
+name: "Collectd"
+playbook:
+- hosts: centos:debian
+  sudo: true
+  roles:
+  - role: "@ROLE_NAME@"
+    private_interface: eth0
