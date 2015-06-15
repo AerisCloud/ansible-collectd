@@ -17,3 +17,12 @@
     - install
     - collectd
     - pkgs
+
+- name: "Load coretemp module on boot"
+  lineinfile: >
+    dest=/etc/modules
+    line=coretemp
+  when: monitor_coretemp
+  tags:
+    - collectd
+    - files
