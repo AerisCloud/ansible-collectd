@@ -1,0 +1,8 @@
+LoadPlugin write_http
+<Plugin write_http>
+  <URL "https://collectd.librato.com/v1/measurements">
+    User "{{ librato_email }}"
+    Password "{{ librato_token }}"
+    Format "JSON"
+  </URL>
+</Plugin>

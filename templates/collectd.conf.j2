@@ -67,6 +67,7 @@ LoadPlugin memory
 LoadPlugin vmem
 LoadPlugin swap
 
+LoadPlugin disk
 <Plugin "disk">
     Disk "/^{{ check_disk|default('xvde') }}/"
     IgnoreSelected false
@@ -75,6 +76,7 @@ LoadPlugin swap
 LoadPlugin load
 LoadPlugin cpu
 
+LoadPlugin interface
 <Plugin "interface">
 	Interface "lo"
 	IgnoreSelected true
@@ -94,12 +96,14 @@ LoadPlugin cpu
 # could not be forwarded to our monitoring
 # tool of choice in the meantime
 #
+LoadPlugin rrdtool
 <Plugin "rrdtool">
     DataDir "/var/lib/collectd/rrd"
     CacheFlush 120
     WritesPerSecond 50
 </Plugin>
 
+LoadPlugin network
 <Plugin network>
     {% if collectd_forwarder is defined and collectd_forward_to_logstash %}
 	<Server "{{ hostvars[collectd_forwarder]['ansible_ssh_host'] }}" "25827">
@@ -129,6 +133,7 @@ LoadPlugin cpu
 	ReportStats false
 </Plugin>
 
+LoadPlugin df
 <Plugin df>
 	FSType "{{ fs_type|default('ext4') }}"
 </Plugin>
@@ -139,28 +144,6 @@ LoadPlugin cpu
 LoadPlugin python
 
 {% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
-#
-# This section should be only on machine forwarding
-# data to external databases and tools
-#
-<Plugin "python">
-
-	ModulePath "/opt/collectd-python-modules/"
-
-    {% if use_librato %}
-    #
-    # Librato plugin to forward monitoring
-    # data to librato for visualization and
-    # alerting
-    #
-    Import "collectd-librato"
-	<Module "collectd-librato">
-		Email    "{{ librato_email }}"
-		APIToken "{{ librato_token }}"
-	</Module>
-    {% endif %}
-</Plugin>
-
 {% if use_graphite %}
 <LoadPlugin write_graphite>
     Interval     {{ graphite_interval|default('10') }}
