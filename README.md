@@ -62,6 +62,10 @@ The following may also be added to your inventory.
 * `check_disk`: a value which we will use to select what disk to monitor (default: xvde)
 * `fs_type`: the file system type to monitor (default: ext4)
 * `monitor_coretemp`: set to true if you want to monitor coretemp (only useful on real hardware)
+* `private_ip`: set to the IP address of the `collectd_forwarder` if `collectd_fowarder` has multiple IPs. Example:
+```
+collectd1.somedc.prod         ansible_ssh_host=10.0.1.111   private_ip=172.16.1.111
+```
 
 ### Roles addition
 

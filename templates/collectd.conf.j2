@@ -106,14 +106,14 @@ LoadPlugin rrdtool
 LoadPlugin network
 <Plugin network>
     {% if collectd_forwarder is defined and collectd_forward_to_logstash %}
-	<Server "{{ hostvars[collectd_forwarder]['ansible_ssh_host'] }}" "25827">
+	<Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25827">
 		Interface "{{ private_interface }}"
 	</Server>
 
 	TimeToLive 128
 
     {% elif collectd_forwarder is defined and collectd_forwarder != inventory_hostname %}
-	<Server "{{ hostvars[collectd_forwarder]['ansible_ssh_host'] }}" "25826">
+	<Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25826">
 		Interface "{{ private_interface }}"
 	</Server>
 
