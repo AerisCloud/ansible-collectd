@@ -6,33 +6,34 @@
 
 #####################
 # Common
-- name: "Install Librato backend"
-  git: >
-    repo=https://github.com/librato/collectd-librato.git
-    version=v0.0.8
-    dest=/opt/collectd-librato/
-  tags:
-    - collectd
-    - pkgs
-    - libs
-
-- name: "Ensure the collectd python and exec module directory exists"
+- name: "Ensure the collectd exec module directory exists"
   file: >
-    path=/opt/collectd-{{ item }}-modules
+    path=/opt/collectd-exec-modules
     state=directory
-  with_items:
-    - python
-    - exec
   tags:
     - collectd
     - pkgs
     - libs
 
-- name: "Symlink the librato module into the python module directory"
+- name: "Make sure /etc/collectd.d is present"
   file: >
-    src=/opt/collectd-librato/lib/collectd-librato.py
-    dest=/opt/collectd-python-modules/collectd-librato.py
-    state=link
+    path=/etc/collectd.d
+    state=directory
+  tags:
+    - collectd
+    - files
+    - configs
+
+- name: "Upload Librato collectd config"
+  template: >
+    src=librato.conf.j2
+    dest=/etc/collectd.d/librato.conf
+    owner=root
+    group=root
+    mode=0644
+  when: use_librato and collectd_forwarder is defined and collectd_forwarder == inventory_hostname
+  notify:
+    - Restart collectd
   tags:
     - collectd
     - libs
@@ -57,15 +58,6 @@
     mode=0644
   notify:
     - Restart collectd
-  tags:
-    - collectd
-    - files
-    - configs
-
-- name: "Make sure /etc/collectd.d is present"
-  file: >
-    path=/etc/collectd.d
-    state=directory
   tags:
     - collectd
     - files
