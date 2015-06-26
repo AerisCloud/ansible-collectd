@@ -47,3 +47,27 @@
   tags:
     - collectd
     - pkgs
+
+- name: "Load coretemp module on boot"
+  copy: >
+    src=coretemp.modules
+    dest=/etc/sysconfig/modules/coretemp.modules
+    owner=root
+    group=root
+    mode=0700
+  when: monitor_coretemp and ansible_distribution_major_version|int == 6
+  tags:
+    - collectd
+    - files
+
+- name: "Load coretemp module on boot"
+  copy: >
+    content=coretemp
+    dest=/etc/modules-load.d/coretemp.conf
+    owner=root
+    group=root
+    mode=0600
+  when: monitor_coretemp and ansible_distribution_major_version|int == 7
+  tags:
+    - collectd
+    - files
