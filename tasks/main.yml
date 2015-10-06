@@ -4,6 +4,9 @@
 - include: debian.yml
   when: ansible_distribution == "Debian"
 
+- include: amazon.yml
+  when: ansible_distribution == "Amazon"
+
 #####################
 # Common
 - name: "Ensure the collectd exec module directory exists"

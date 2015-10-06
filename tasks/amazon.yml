@@ -1,0 +1,29 @@
+- include_vars: "Amazon.yml"
+
+- name: "Set collectd's config file destination"
+  set_fact: >
+    collectd_config_dest=/etc/collectd.conf
+  tags:
+    - collectd
+
+- name: "Clean old packages"
+  yum: >
+    name={{ item }}
+    state=absent
+  with_items:
+    - collectd-python
+    - collectd-hddtemp
+    - libcollectdclient
+  tags:
+    - collectd
+    - pkgs
+
+- name: "Install required packages"
+  yum : >
+    name={{ item }}
+    state=latest
+  with_items: packages
+  tags:
+    - collectd
+    - pkgs
+
