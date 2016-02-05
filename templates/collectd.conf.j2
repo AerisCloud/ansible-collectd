@@ -144,7 +144,7 @@ LoadPlugin df
 LoadPlugin python
 
 {% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
-{% if use_graphite %}
+{% if use_graphite|bool %}
 <LoadPlugin write_graphite>
     Interval     {{ graphite_interval|default('10') }}
 </LoadPlugin>
