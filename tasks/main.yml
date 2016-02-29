@@ -31,7 +31,7 @@
     owner=root
     group=root
     mode=0644
-  when: use_librato and collectd_forwarder is defined and collectd_forwarder == inventory_hostname
+  when: use_librato|bool and collectd_forwarder is defined and collectd_forwarder == inventory_hostname
   notify:
     - Restart collectd
   tags:

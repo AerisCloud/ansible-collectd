@@ -82,7 +82,7 @@ LoadPlugin interface
 	IgnoreSelected true
 </Plugin>
 
-{% if monitor_coretemp %}
+{% if monitor_coretemp|bool %}
 <Plugin exec>
   Exec nobody "/opt/collectd-exec-modules/collectd-coretemp.sh"
 </Plugin>
@@ -105,7 +105,7 @@ LoadPlugin rrdtool
 
 LoadPlugin network
 <Plugin network>
-    {% if collectd_forwarder is defined and collectd_forward_to_logstash %}
+    {% if collectd_forwarder is defined and collectd_forward_to_logstash|bool %}
 	<Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25827">
 		Interface "{{ private_interface }}"
 	</Server>
@@ -144,7 +144,7 @@ LoadPlugin df
 LoadPlugin python
 
 {% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
-{% if use_graphite %}
+{% if use_graphite|bool %}
 <LoadPlugin write_graphite>
     Interval     {{ graphite_interval|default('10') }}
 </LoadPlugin>
