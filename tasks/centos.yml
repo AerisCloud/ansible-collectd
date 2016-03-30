@@ -18,7 +18,7 @@
 
 - name: "Install Ghettoforge repo"
   yum: >
-    name=http://mirror.symnds.com/distributions/gf/el/6/gf/x86_64/gf-release-6-8.gf.el6.noarch.rpm
+    name=http://mirror.symnds.com/distributions/gf/el/6/gf/x86_64/gf-release-6-10.gf.el6.noarch.rpm
     state=present
   when: ansible_distribution_major_version|int == 6
   tags:
