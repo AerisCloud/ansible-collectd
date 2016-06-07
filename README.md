@@ -67,6 +67,47 @@ The following may also be added to your inventory.
 collectd1.somedc.prod         ansible_ssh_host=10.0.1.111   private_ip=172.16.1.111
 ```
 
+### Plugin configuration
+
+#### [Disk](https://collectd.org/wiki/index.php/Plugin:Disk)
+
+
+Default: xvde
+
+```
+check_disk: xvde
+```
+
+#### [DF](https://collectd.org/wiki/index.php/Plugin:DF)
+
+All options are optional.
+
+For Collectd 5.4, define `fs_type`. Example `fs_type: ext4`. Note: Do not set `fs_type` if you're using Collectd 5.5.
+
+For Collectd 5.5, the following should be set as an array.
+Example 1: (Single value)
+```
+collectd_df_device: '["/dev/xvda1"]'
+collectd_df_mountpoint: '["/"]'
+collectd_df_fs_type: '["xfs"]'
+```
+Example 2: (Multiple values)
+```
+collectd_df_device: '["/dev/xvda1","/dev/xvdb1"]'
+collectd_df_mountpoint: '["/","/data"]'
+collectd_df_fs_type: '["xfs","ext4"]'
+```
+
+You can change the rest of the defaults.
+```
+collectd_df_IgnoreSelected: false
+collectd_df_ReportByDevice: false
+collectd_df_ReportInodes: false
+collectd_df_ValuesAbsolute: true
+collectd_df_ValuesPercentage: false
+```
+	
+	
 ### Roles addition
 
 It is possible for any roles to add their own custom metric collection configuration.

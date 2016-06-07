@@ -26,3 +26,19 @@
   tags:
     - collectd
     - files
+
+- name: "Get Collectd version"
+  shell: |
+    executable=/bin/bash
+    v=$(dpkg-query --showformat='${Version}' --show collectd); echo "${v%.*}"
+  register: collectd_version
+  tags:
+    - collectd
+    - files
+
+- name: "Set version"
+  set_fact:
+    installed_version: "{{ collectd_version.stdout }}"
+  tags:
+    - collectd
+    - files

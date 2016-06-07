@@ -26,7 +26,7 @@
 
 - name: "Upload Librato collectd config"
   template: >
-    src=librato.conf.j2
+    src=librato.conf.{{ installed_version }}.j2
     dest=/etc/collectd.d/librato.conf
     owner=root
     group=root
@@ -53,7 +53,7 @@
 
 - name: "Install /etc/collectd.conf"
   template: >
-    src=collectd.conf.j2
+    src=collectd.conf.{{ installed_version }}.j2
     dest={{ collectd_config_dest }}
     mode=0644
   notify:
