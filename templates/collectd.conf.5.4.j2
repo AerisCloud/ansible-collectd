@@ -135,7 +135,9 @@ LoadPlugin network
 
 LoadPlugin df
 <Plugin df>
-	FSType "{{ fs_type|default('ext4') }}"
+{% for fs in collectd_df_fs_type|default('["ext4"]')|from_json %}
+    FSType "{{ fs }}"
+{% endfor %}
 </Plugin>
 
 #

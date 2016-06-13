@@ -82,9 +82,7 @@ check_disk: xvde
 
 All options are optional.
 
-For Collectd 5.4, define `fs_type`. Example `fs_type: ext4`. Note: Do not set `fs_type` if you're using Collectd 5.5.
-
-For Collectd 5.5, the following should be set as an array.
+The following should be set as an array.
 Example 1: (Single value)
 ```
 collectd_df_device: '["/dev/xvda1"]'
