@@ -60,7 +60,14 @@ The following may also be added to your inventory.
 
 * `collectd_interval`: at what interval in seconds to take measurements (default: 60)
 * `check_disk`: a value which we will use to select what disk to monitor (default: xvde)
-* `fs_type`: the file system type to monitor (default: ext4)
+* `collectd_df_fs_type`: the file system type to monitor (Collectd 5.4 default: ext4. Collectd 5.5 default: undefined)
+* `collectd_df_device`: the dev device to monitor.
+* `collectd_df_mountpoint`: the mount point to monitor.
+* `collectd_df_IgnoreSelected`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
+* `collectd_df_ReportByDevice`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
+* `collectd_df_ReportInodes`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
+* `collectd_df_ValuesAbsolute`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: true)
+* `collectd_df_ValuesPercentage`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
 * `monitor_coretemp`: set to true if you want to monitor coretemp (only useful on real hardware)
 * `private_ip`: set to the IP address of the `collectd_forwarder` if `collectd_fowarder` has multiple IPs. Example:
 ```
@@ -104,8 +111,8 @@ collectd_df_ReportInodes: false
 collectd_df_ValuesAbsolute: true
 collectd_df_ValuesPercentage: false
 ```
-	
-	
+
+
 ### Roles addition
 
 It is possible for any roles to add their own custom metric collection configuration.
