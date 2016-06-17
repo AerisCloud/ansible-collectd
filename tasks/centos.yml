@@ -1,6 +1,7 @@
 - name: "Set collectd's config file destination"
   set_fact: >
     collectd_config_dest=/etc/collectd.conf
+    collectd_d_config_dir=/etc/collectd.d
   tags:
     - collectd
 
@@ -68,6 +69,22 @@
     group=root
     mode=0600
   when: monitor_coretemp and ansible_distribution_major_version|int == 7
+  tags:
+    - collectd
+    - files
+
+- name: "Get Collectd version"
+  shell: |
+    executable=/bin/bash
+    v=$(rpm -qa --queryformat %{version} collectd); echo "${v%.*}"
+  register: collectd_version
+  tags:
+    - collectd
+    - files
+
+- name: "Set version"
+  set_fact:
+    installed_version: "{{ collectd_version.stdout }}"
   tags:
     - collectd
     - files

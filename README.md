@@ -60,12 +60,58 @@ The following may also be added to your inventory.
 
 * `collectd_interval`: at what interval in seconds to take measurements (default: 60)
 * `check_disk`: a value which we will use to select what disk to monitor (default: xvde)
-* `fs_type`: the file system type to monitor (default: ext4)
+* `collectd_df_fs_type`: the file system type to monitor (Collectd 5.4 default: ext4. Collectd 5.5 default: undefined)
+* `collectd_df_device`: the dev device to monitor.
+* `collectd_df_mountpoint`: the mount point to monitor.
+* `collectd_df_IgnoreSelected`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
+* `collectd_df_ReportByDevice`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
+* `collectd_df_ReportInodes`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
+* `collectd_df_ValuesAbsolute`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: true)
+* `collectd_df_ValuesPercentage`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
 * `monitor_coretemp`: set to true if you want to monitor coretemp (only useful on real hardware)
 * `private_ip`: set to the IP address of the `collectd_forwarder` if `collectd_fowarder` has multiple IPs. Example:
 ```
 collectd1.somedc.prod         ansible_ssh_host=10.0.1.111   private_ip=172.16.1.111
 ```
+
+### Plugin configuration
+
+#### [Disk](https://collectd.org/wiki/index.php/Plugin:Disk)
+
+
+Default: xvde
+
+```
+check_disk: xvde
+```
+
+#### [DF](https://collectd.org/wiki/index.php/Plugin:DF)
+
+All options are optional.
+
+The following should be set as an array.
+Example 1: (Single value)
+```
+collectd_df_device: '["/dev/xvda1"]'
+collectd_df_mountpoint: '["/"]'
+collectd_df_fs_type: '["xfs"]'
+```
+Example 2: (Multiple values)
+```
+collectd_df_device: '["/dev/xvda1","/dev/xvdb1"]'
+collectd_df_mountpoint: '["/","/data"]'
+collectd_df_fs_type: '["xfs","ext4"]'
+```
+
+You can change the rest of the defaults.
+```
+collectd_df_IgnoreSelected: false
+collectd_df_ReportByDevice: false
+collectd_df_ReportInodes: false
+collectd_df_ValuesAbsolute: true
+collectd_df_ValuesPercentage: false
+```
+
 
 ### Roles addition
 

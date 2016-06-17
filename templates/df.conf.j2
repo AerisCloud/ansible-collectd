@@ -1,0 +1,23 @@
+LoadPlugin df
+<Plugin df>
+{% if collectd_df_device is defined %}
+{% for device in collectd_df_device|from_json %}
+    Device "{{ device }}"
+{% endfor %}
+{% endif %}
+{% if collectd_df_mountpoint is defined %}
+{% for mountpoint in collectd_df_mountpoint|from_json %}
+    MountPoint "{{ mountpoint }}"
+{% endfor %}
+{% endif %}
+{% if collectd_df_fs_type is defined %}
+{% for fs in collectd_df_fs_type|from_json %}
+    FSType "{{ fs|default('ext4') }}"
+{% endfor %}
+{% endif %}
+{% if collectd_df_IgnoreSelected is defined %}    IgnoreSelected "{{ collectd_df_IgnoreSelected|default('false') }}"{% endif %}
+{% if collectd_df_ReportByDevice is defined %}    ReportByDevice "{{ collectd_df_ReportByDevice|default('false') }}"{% endif %}
+{% if collectd_df_ReportInodes is defined %}    ReportInodes "{{ collectd_df_ReportInodes|default('false') }}"{% endif %}
+{% if collectd_df_ValuesAbsolute is defined %}    ValuesAbsolute "{{ collectd_df_ValuesAbsolute|default('true') }}"{% endif %}
+{% if collectd_df_ValuesPercentage is defined %}    ValuesPercentage "{{ collectd_df_ValuesPercentage|default('false') }}"{% endif %}
+</Plugin>
