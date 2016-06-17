@@ -1,6 +1,7 @@
 - name: "Set collectd's config file destination"
   set_fact: >
     collectd_config_dest=/etc/collectd/collectd.conf
+    collectd_d_config_dir=/etc/collectd/collectd.conf.d
   tags:
     - collectd
 

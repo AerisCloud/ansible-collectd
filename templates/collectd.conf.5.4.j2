@@ -133,12 +133,6 @@ LoadPlugin network
 	ReportStats false
 </Plugin>
 
-LoadPlugin df
-<Plugin df>
-{% for fs in collectd_df_fs_type|default('["ext4"]')|from_json %}
-    FSType "{{ fs }}"
-{% endfor %}
-</Plugin>
 
 #
 # Custom python plugins
