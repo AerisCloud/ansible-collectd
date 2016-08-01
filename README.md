@@ -112,6 +112,54 @@ collectd_df_ValuesAbsolute: true
 collectd_df_ValuesPercentage: false
 ```
 
+### Install plugins
+
+To indicate the plugins that you would like installed, list all the plugins in the `packages` variable in 
+your `group_vars` folder.
+
+For example, below installs only the `collect-rrdtools`, `collectd-rrdtool` and `collectd-iptables` plugins.
+
+```
+packages:
+  - collectd-rrdcached
+  - collectd-rrdtool
+  - collectd-iptables
+```
+
+If you do not set `packages`, the following default packages that will be installed.
+
+```
+  - git
+  - collectd
+  - collectd-amqp
+  - collectd-apache
+  - collectd-bind
+  - collectd-curl
+  - collectd-curl_json
+  - collectd-curl_xml
+  - collectd-dbi
+  - collectd-dns
+  - collectd-generic-jmx
+  - collectd-iptables
+  - collectd-ipvs
+  - collectd-java
+  - collectd-lvm
+  - collectd-mysql
+  - collectd-netlink
+  - collectd-notify_desktop
+  - collectd-postgresql
+  - collectd-rrdcached
+  - collectd-rrdtool
+  - collectd-sensors
+  - collectd-snmp
+  - collectd-write_riemann
+```
+
+The following command will list the possible packages that can be installed:
+
+  - CentOS 6: `sudo yum --enablerepo="epel,gf-plus" list available | grep collectd-`
+  - CentOS 7: `sudo yum --enablerepo="epel" list available | grep collectd-`
+
 
 ### Roles addition
 
