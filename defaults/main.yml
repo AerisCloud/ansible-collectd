@@ -3,3 +3,27 @@ collectd_forward_to_logstash: false
 
 use_librato: false
 use_graphite: false
+
+packages:
+  - git
+  - collectd
+  - collectd-amqp
+  - collectd-apache
+  - collectd-bind
+  - collectd-curl
+  - collectd-curl_json
+  - collectd-curl_xml
+  - collectd-dbi
+  - collectd-generic-jmx
+  - collectd-iptables
+  - collectd-ipvs
+  - collectd-java
+  - collectd-lvm
+  - collectd-mysql
+  - collectd-netlink
+  - collectd-notify_desktop
+  - collectd-postgresql
+  - collectd-rrdcached
+  - collectd-rrdtool
+  - collectd-snmp
+  - collectd-write_riemann
