@@ -1,0 +1,6 @@
+{% if monitor_coretemp|bool %}
+LoadPlugin exec
+<Plugin exec>
+  Exec nobody "/opt/collectd-exec-modules/collectd-coretemp.sh"
+</Plugin>
+{% endif %}

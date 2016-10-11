@@ -4,6 +4,22 @@ collectd_forward_to_logstash: false
 use_librato: false
 use_graphite: false
 
+collectd_plugins:
+  - syslog
+  - cpu
+  - interface
+  - load
+  - memory
+  - vmem
+  - swap
+  - disk
+  - rrdtool
+  - network
+  - python
+  - librato
+  - exec
+  - write_graphite
+
 packages:
   - git
   - collectd

@@ -22,15 +22,15 @@ FQDNLookup   false
 # when an appropriate <Plugin ...> block is encountered.                     #
 # Disabled by default.                                                       #
 #----------------------------------------------------------------------------#
-AutoLoadPlugin true
-
+AutoLoadPlugin false
+{% if installed_version|version_compare("5.5", ">=") %}
 #----------------------------------------------------------------------------#
 # When enabled, internal statistics are collected, using "collectd" as the   #
 # plugin name.                                                               #
 # Disabled by default.                                                       #
 #----------------------------------------------------------------------------#
 #CollectInternalStats false
-
+{% endif %}
 #----------------------------------------------------------------------------#
 # Interval at which to query values. This may be overwritten on a per-plugin #
 # base by using the 'Interval' option of the LoadPlugin block:               #
@@ -39,8 +39,7 @@ AutoLoadPlugin true
 #   </LoadPlugin>                                                            #
 #----------------------------------------------------------------------------#
 Interval     {{ collectd_interval|default('60') }}
-
-#MaxReadInterval 86400
+{% if installed_version|version_compare("5.5", ">=") %}#MaxReadInterval 86400{% endif %}
 #Timeout         2
 #ReadThreads     5
 #WriteThreads    5
@@ -58,9 +57,12 @@ Interval     {{ collectd_interval|default('60') }}
 # accessed.                                                                  #
 ##############################################################################
 
-LoadPlugin syslog
+#LoadPlugin syslog
+#<Plugin syslog>
+#	LogLevel info
+#</Plugin>
 #LoadPlugin logfile
-#LoadPlugin log_logstash
+{% if installed_version|version_compare("5.5", ">=") %}#LoadPlugin log_logstash{% endif %}
 
 #<Plugin logfile>
 #	LogLevel info
@@ -69,14 +71,11 @@ LoadPlugin syslog
 #	PrintSeverity false
 #</Plugin>
 
-#<Plugin log_logstash>
+{% if installed_version|version_compare("5.5", ">=") %}#<Plugin log_logstash>
 #	LogLevel info
 #	File "/var/log/collectd.json.log"
 #</Plugin>
-
-<Plugin syslog>
-	LogLevel info
-</Plugin>
+{% endif %}
 
 ##############################################################################
 # LoadPlugin section                                                         #
@@ -84,7 +83,7 @@ LoadPlugin syslog
 # Lines beginning with a single `#' belong to plugins which have been built  #
 # but are disabled by default.                                               #
 #                                                                            #
-# Lines begnning with `##' belong to plugins which have not been built due   #
+# Lines beginning with `##' belong to plugins which have not been built due  #
 # to missing dependencies or because they have been deactivated explicitly.  #
 ##############################################################################
 
@@ -100,97 +99,62 @@ LoadPlugin syslog
 #LoadPlugin bind
 #LoadPlugin ceph
 #LoadPlugin cgroups
+#LoadPlugin chrony
 #LoadPlugin conntrack
 #LoadPlugin contextswitch
-LoadPlugin cpu
+#LoadPlugin cpu
 #LoadPlugin cpufreq
+#LoadPlugin cpusleep
 #LoadPlugin csv
 #LoadPlugin curl
 #LoadPlugin curl_json
 #LoadPlugin curl_xml
 #LoadPlugin dbi
-LoadPlugin disk
-<Plugin "disk">
-    Disk "/^{{ check_disk|default('xvde') }}/"
-    IgnoreSelected false
-</Plugin>
+#LoadPlugin df
+#LoadPlugin disk
 #LoadPlugin dns
 #LoadPlugin drbd
 #LoadPlugin email
 #LoadPlugin entropy
 #LoadPlugin ethstat
-{% if monitor_coretemp|bool %}
-LoadPlugin exec
-<Plugin exec>
-  Exec nobody "/opt/collectd-exec-modules/collectd-coretemp.sh"
-</Plugin>
-{% else %}
 #LoadPlugin exec
-{% endif %}
 #LoadPlugin fhcount
 #LoadPlugin filecount
 #LoadPlugin fscache
 #LoadPlugin gmond
+#LoadPlugin gps
+##LoadPlugin grpc
 #LoadPlugin hddtemp
-LoadPlugin interface
-<Plugin "interface">
-	Interface "lo"
-	IgnoreSelected true
-</Plugin>
+#LoadPlugin interface
 #LoadPlugin ipc
 #LoadPlugin ipmi
 #LoadPlugin iptables
 #LoadPlugin ipvs
 #LoadPlugin irq
 #LoadPlugin java
-LoadPlugin load
+#LoadPlugin load
 ##LoadPlugin lpar
+#LoadPlugin lua
 #LoadPlugin lvm
 #LoadPlugin madwifi
 #LoadPlugin mbmon
 #LoadPlugin md
 ##LoadPlugin memcachec
 #LoadPlugin memcached
-LoadPlugin memory
+#LoadPlugin memory
 ##LoadPlugin mic
 #LoadPlugin modbus
+#LoadPlugin mqtt
 #LoadPlugin multimeter
 #LoadPlugin mysql
 ##LoadPlugin netapp
 #LoadPlugin netlink
-LoadPlugin network
-<Plugin network>
-    {% if collectd_forwarder is defined and collectd_forward_to_logstash|bool %}
-	<Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25827">
-		Interface "{{ private_interface }}"
-	</Server>
-
-	TimeToLive 128
-
-    {% elif collectd_forwarder is defined and collectd_forwarder != inventory_hostname %}
-	<Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25826">
-		Interface "{{ private_interface }}"
-	</Server>
-
-	TimeToLive 128
-
-	{% else %}
-
-	<Listen "0.0.0.0" "25826">
-		Interface "{{ private_interface }}"
-	</Listen>
-
-	MaxPacketSize 4096
-
-	{% endif %}
-
-	# statistics about the network plugin itself
-	ReportStats false
-</Plugin>
+#LoadPlugin network
 #LoadPlugin nfs
 #LoadPlugin nginx
 #LoadPlugin notify_desktop
 #LoadPlugin notify_email
+#LoadPlugin notify_nagios
 #LoadPlugin ntpd
 #LoadPlugin numa
 #LoadPlugin nut
@@ -207,43 +171,10 @@ LoadPlugin network
 #LoadPlugin processes
 #LoadPlugin protocols
 #LoadPlugin python
-
-#
-# Custom python plugins
-#
-LoadPlugin python
-
-{% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
-{% if use_graphite|bool %}
-<LoadPlugin write_graphite>
-    Interval     {{ graphite_interval|default('10') }}
-</LoadPlugin>
-<Plugin write_graphite>
-  <Node "graphite">
-    Host "{{ graphite_host }}"
-    Port "{{ graphite_port }}"
-    Protocol "udp"
-    LogSendErrors true
-    Prefix "collectd"
-    Postfix "collectd"
-    StoreRates true
-    AlwaysAppendDS false
-    EscapeCharacter "_"
-  </Node>
-</Plugin>
-{% endif %}
-{% endif %}
-
-
 #LoadPlugin redis
 ##LoadPlugin routeros
 #LoadPlugin rrdcached
-LoadPlugin rrdtool
-<Plugin "rrdtool">
-    DataDir "/var/lib/collectd/rrd"
-    CacheFlush 120
-    WritesPerSecond 50
-</Plugin>
+#LoadPlugin rrdtool
 #LoadPlugin sensors
 #LoadPlugin serial
 ##LoadPlugin sigrok
@@ -267,7 +198,7 @@ LoadPlugin rrdtool
 #LoadPlugin uuid
 #LoadPlugin varnish
 #LoadPlugin virt
-LoadPlugin vmem
+#LoadPlugin vmem
 #LoadPlugin vserver
 #LoadPlugin wireless
 #LoadPlugin write_graphite
@@ -279,8 +210,10 @@ LoadPlugin vmem
 #LoadPlugin write_riemann
 #LoadPlugin write_sensu
 #LoadPlugin write_tsdb
+##LoadPlugin xencpu
 ##LoadPlugin xmms
-##LoadPlugin zfs_arc
+#LoadPlugin zfs_arc
+##LoadPlugin zone
 #LoadPlugin zookeeper
 
 ##############################################################################
@@ -338,6 +271,7 @@ LoadPlugin vmem
 #	Host "localhost"
 #	Port "3551"
 #	ReportSeconds true
+#	PersistentConnection true
 #</Plugin>
 
 #<Plugin aquaero>
@@ -350,7 +284,7 @@ LoadPlugin vmem
 #	Password "secret"
 #	CACert "/etc/ssl/ca.crt"
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin "barometer">
 #   Device            "/dev/i2c-0";
 #   Oversampling      512
@@ -365,7 +299,7 @@ LoadPlugin vmem
 #  ValuesPercentage false
 #  ReportDegraded false
 #</Plugin>
-
+{% endif %}
 #<Plugin "bind">
 #  URL "http://localhost:8053/"
 #  ParseTime       false
@@ -385,7 +319,7 @@ LoadPlugin vmem
 #    Zone "127.in-addr.arpa/IN"
 #  </View>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin ceph>
 #  LongRunAvgLatency false
 #  ConvertSpecialMetricTypes true
@@ -403,17 +337,23 @@ LoadPlugin vmem
 #  </Daemon>
 #</Plugin>
 
+#<Plugin chrony>
+#	Host    "localhost"
+#	Port    "323"
+#	Timeout "2"
+#</Plugin>
+{% endif %}
 #<Plugin cgroups>
 #  CGroup "libvirt"
 #  IgnoreSelected false
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin cpu>
 #  ReportByCpu true
 #  ReportByState true
 #  ValuesPercentage false
 #</Plugin>
-#
+{% endif %}
 #<Plugin csv>
 #	DataDir "/var/lib/collectd/csv"
 #	StoreRates false
@@ -424,6 +364,7 @@ LoadPlugin vmem
 #    URL "http://finance.google.com/finance?q=NYSE%3AAMD"
 #    User "foo"
 #    Password "bar"
+{% if installed_version|version_compare("5.5", ">=") %}
 #    Digest false
 #    VerifyPeer true
 #    VerifyHost true
@@ -431,8 +372,9 @@ LoadPlugin vmem
 #    Header "X-Custom-Header: foobar"
 #    Post "foo=bar"
 #
-#    MeasureResponseTime false
 #    MeasureResponseCode false
+{% endif %}
+#    MeasureResponseTime false
 #    <Match>
 #      Regex "<span +class=\"pr\"[^>]*> *([0-9]*\\.[0-9]+) *</span>"
 #      DSType "GaugeAverage"
@@ -443,6 +385,7 @@ LoadPlugin vmem
 #</Plugin>
 
 #<Plugin curl_json>
+{% if installed_version|version_compare("5.5", ">=") %}
 #  <URL "http://localhost:80/test.json">
 #    Instance "test_http_json"
 #    <Key "testArray/0">
@@ -478,6 +421,7 @@ LoadPlugin vmem
 #  "testDirectHit":5,
 #  "testSubLevelHit":{"oneMoreLevel":6}
 # }
+{% endif %}
 ## See: http://wiki.apache.org/couchdb/Runtime_Statistics
 #  <URL "http://localhost:5984/_stats">
 #    Instance "httpd"
@@ -514,12 +458,14 @@ LoadPlugin vmem
 #    Instance "some_instance"
 #    User "collectd"
 #    Password "thaiNg0I"
-#    Digest false
 #    VerifyPeer true
 #    VerifyHost true
 #    CACert "/path/to/ca.crt"
+{% if installed_version|version_compare("5.5", ">=") %}
+#    Digest false
 #    Header "X-Custom-Header: foobar"
 #    Post "foo=bar"
+{% endif %}
 #
 #    <XPath "table[@id=\"magic_level\"]/tr">
 #      Type "magic_level"
@@ -559,6 +505,9 @@ LoadPlugin vmem
 #	FSType "ext3"
 #	IgnoreSelected false
 #	ReportByDevice false
+{% if installed_version|version_compare("5.4", "<=") %}
+#	ReportReserved false
+{% endif %}
 #	ReportInodes false
 #	ValuesAbsolute true
 #	ValuesPercentage false
@@ -567,8 +516,10 @@ LoadPlugin vmem
 #<Plugin disk>
 #	Disk "/^[hs]d[a-f][0-9]?$/"
 #	IgnoreSelected false
+{% if installed_version|version_compare("5.5", ">=") %}
 #	UseBSDName false
 #	UdevNameAttr "DEVNAME"
+{% endif %}
 #</Plugin>
 
 #<Plugin dns>
@@ -595,12 +546,12 @@ LoadPlugin vmem
 #	Exec "user:group" "/path/to/exec"
 #	NotificationExec "user:group" "/path/to/exec"
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin fhcount>
 #	ValuesAbsolute true
 #	ValuesPercentage false
 #</Plugin>
-
+{% endif %}
 #<Plugin filecount>
 #	<Directory "/path/to/dir">
 #		Instance "foodir"
@@ -625,7 +576,28 @@ LoadPlugin vmem
 #    DataSource "value"
 #  </Metric>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
+#<Plugin gps>
+#  Host "127.0.0.1"
+#  Port "2947"
+#  Timeout 0.015
+#  PauseConnect 5
+#</Plugin>
+#<Plugin grpc>
+#	<Server "example.com" "50051">
+#		EnableSSL true
+#		SSLCACertificateFile "/path/to/root.pem"
+#		SSLCertificateFile "/path/to/server.pem"
+#		SSLCertificateKeyFile "/path/to/server.key"
+#	</Server>
+#	<Listen "0.0.0.0" "50051">
+#		EnableSSL true
+#		SSLCACertificateFile "/path/to/root.pem"
+#		SSLCertificateFile "/path/to/client.pem"
+#		SSLCertificateKeyFile "/path/to/client.key"
+#	</Listen>
+#</Plugin>
+{% endif %}
 #<Plugin hddtemp>
 #  Host "127.0.0.1"
 #  Port "7634"
@@ -634,6 +606,10 @@ LoadPlugin vmem
 #<Plugin interface>
 #	Interface "eth0"
 #	IgnoreSelected false
+{% if installed_version|version_compare("5.5", ">=") %}
+#	ReportInactive true
+#	UniqueName false
+{% endif %}
 #</Plugin>
 
 #<Plugin ipmi>
@@ -647,7 +623,9 @@ LoadPlugin vmem
 
 #<Plugin iptables>
 #	Chain table chain
+{% if installed_version|version_compare("5.5", ">=") %}
 #	Chain6 table chain
+{% endif %}
 #</Plugin>
 
 #<Plugin irq>
@@ -666,16 +644,22 @@ LoadPlugin vmem
 #	  # To be parsed by the plugin
 #	</Plugin>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin load>
 #        ReportRelative true
 #</Plugin>
-
+{% endif %}
 #<Plugin lpar>
 #	CpuPoolStats   false
 #	ReportBySerial false
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
+#<Plugin lua>
+#	BasePath "/usr/share/collectd/lua"
+#	Script "script1.lua"
+#	Script "script2.lua"
+#</Plugin>
+{% endif %}
 #<Plugin madwifi>
 #	Interface "wlan0"
 #	IgnoreSelected false
@@ -717,12 +701,12 @@ LoadPlugin vmem
 #		Port "11211"
 #	</Instance>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin memory>
 #	ValuesAbsolute true
 #	ValuesPercentage false
 #</Plugin>
-
+{% endif %}
 #<Plugin modbus>
 #	<Data "data_name">
 #		RegisterBase 1234
@@ -743,25 +727,71 @@ LoadPlugin vmem
 #		</Slave>
 #	</Host>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
+#<Plugin mqtt>
+#	<Publish "name">
+#		Host "localhost"
+#		Port 1883
+#		ClientId "localhost"
+#		User "user"
+#		Password "secret"
+#		QoS 0
+#		Prefix "collectd"
+#		StoreRates true
+#		Retain false
+#		CACert "/etc/ssl/ca.crt"
+#		CertificateFile "/etc/ssl/client.crt"
+#		CertificateKeyFile "/etc/ssl/client.pem"
+#		TLSProtocol "tlsv1.2"
+#		CipherSuite "ciphers"
+#	</Publish>
+#	<Subscribe "name">
+#		Host "localhost"
+#		Port 1883
+#		ClientId "localhost"
+#		User "user"
+#		Password "secret"
+#		QoS 2
+#		Topic "collectd/#"
+#		CleanSession true
+#	</Subscribe>
+#</Plugin>
+{% endif %}
 #<Plugin mysql>
 #	<Database db_name>
 #		Host "database.serv.er"
 #		User "db_user"
 #		Password "secret"
 #		Database "db_name"
-#		MasterStats true
+{% if installed_version|version_compare("5.5", ">=") %}
+#		SSLKey "/path/to/key.pem"
+#		SSLCert "/path/to/cert.pem"
+#		SSLCA "/path/to/ca.pem"
+#		SSLCAPath "/path/to/cas/"
+#		SSLCipher "DHE-RSA-AES256-SHA"
 #		ConnectTimeout 10
 #		InnodbStats true
+{% endif %}
+#		MasterStats true
 #	</Database>
 #
 #	<Database db_name2>
+{% if installed_version|version_compare("5.5", ">=") %}
 #		Alias "squeeze"
+{% endif %}
 #		Host "localhost"
 #		Socket "/var/run/mysql/mysqld.sock"
 #		SlaveStats true
 #		SlaveNotifications true
 #	</Database>
+{% if installed_version|version_compare("5.5", ">=") %}
+#	<Database galera>
+#		Alias "galera"
+#		Host "localhost"
+#		Socket "/var/run/mysql/mysqld.sock"
+#		WsrepStats true
+#	</Database>
+{% endif %}
 #</Plugin>
 
 #<Plugin netapp>
@@ -833,7 +863,9 @@ LoadPlugin vmem
 #		Username "user"
 #		Password "secret"
 #		Interface "eth0"
+{% if installed_version|version_compare("5.5", ">=") %}
 #		ResolveInterval 14400
+{% endif %}
 #	</Server>
 #	TimeToLive 128
 #
@@ -844,7 +876,11 @@ LoadPlugin vmem
 #		AuthFile "/etc/collectd/passwd"
 #		Interface "eth0"
 #	</Listen>
+{% if installed_version|version_compare("5.4", "<=") %}
+#	MaxPacketSize 1024
+{% else %}
 #	MaxPacketSize 1452
+{% endif %}
 #
 #	# proxy setup (client and server as above):
 #	Forward true
@@ -880,7 +916,11 @@ LoadPlugin vmem
 #	Recipient "email1@domain1.net"
 #	Recipient "email2@domain2.com"
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
+#<Plugin notify_nagios>
+#	CommandFile "/usr/local/nagios/var/rw/nagios.cmd"
+#</Plugin>
+{% endif %}
 #<Plugin ntpd>
 #	Host "localhost"
 #	Port 123
@@ -905,7 +945,7 @@ LoadPlugin vmem
 #	Sensor "F10FCA000800"
 #	IgnoreSelected false
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin openldap>
 #  <Instance "localhost">
 #    URL "ldap://localhost:389"
@@ -916,7 +956,7 @@ LoadPlugin vmem
 #    Version 3
 #  </Instance>
 #</Plugin>
-
+{% endif %}
 #<Plugin openvpn>
 #	StatusFile "/etc/openvpn/openvpn-status.log"
 #	ImprovedNamingSchema false
@@ -1120,12 +1160,12 @@ LoadPlugin vmem
 #    Conn "/dev/ttyUSB1"
 #  </Device>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin smart>
 #  Disk "/^[hs]d[a-f][0-9]?$/"
 #  IgnoreSelected false
 #</Plugin>
-
+{% endif %}
 #<Plugin snmp>
 #   <Data "powerplus_voltge_input">
 #       Type "voltage"
@@ -1175,20 +1215,27 @@ LoadPlugin vmem
 #  DeleteTimers   false
 #  DeleteGauges   false
 #  DeleteSets     false
+{% if installed_version|version_compare("5.5", ">=") %}
+#  CounterSum     false
+{% endif %}
 #  TimerPercentile 90.0
+{% if installed_version|version_compare("5.5", ">=") %}
 #  TimerPercentile 95.0
 #  TimerPercentile 99.0
 #  TimerLower     false
 #  TimerUpper     false
 #  TimerSum       false
 #  TimerCount     false
+{% endif %}
 #</Plugin>
 
 #<Plugin swap>
 #	ReportByDevice false
 #	ReportBytes true
+{% if installed_version|version_compare("5.5", ">=") %}
 #	ValuesAbsolute true
 #	ValuesPercentage false
+{% endif %}
 #</Plugin>
 
 #<Plugin table>
@@ -1259,7 +1306,9 @@ LoadPlugin vmem
 
 #<Plugin tcpconns>
 #	ListeningPorts false
+{% if installed_version|version_compare("5.5", ">=") %}
 #	AllPortsSummary false
+{% endif %}
 #	LocalPort "25"
 #	RemotePort "25"
 #</Plugin>
@@ -1285,15 +1334,15 @@ LoadPlugin vmem
 #	Host "localhost"
 #	Port "1978"
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin turbostat>
 ##	None of the following option should be set manually
 ##	This plugin automatically detect most optimal options
 ##	Only set values here if:
-##	- The module ask you to
+##	- The module asks you to
 ##	- You want to disable the collection of some data
-##	- Your (intel) CPU is not supported (yet) by the module
-##	- The module generate a lot of errors 'MSR offset 0x... read failed'
+##	- Your (Intel) CPU is not supported (yet) by the module
+##	- The module generates a lot of errors 'MSR offset 0x... read failed'
 ##	In the last two cases, please open a bug request
 #
 #	TCCActivationTemp "100"
@@ -1304,7 +1353,7 @@ LoadPlugin vmem
 #	PackageThermalManagement true
 #	RunningAveragePowerLimit "7"
 #</Plugin>
-
+{% endif %}
 #<Plugin unixsock>
 #	SocketFile "/usr/var/run/collectd-unixsock"
 #	SocketGroup "collectd"
@@ -1359,11 +1408,13 @@ LoadPlugin vmem
 #      CollectTotals false
 #      CollectUptime false        # Varnish 3 and above
 #      CollectVCL false
+{% if installed_version|version_compare("5.5", ">=") %}
 #      CollectVSM false           # Varnish 4 only
+{% endif %}
 #      CollectWorkers false
 #   </Instance>
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin virt>
 #	Connection "xen:///"
 #	RefreshInterval 60
@@ -1375,7 +1426,7 @@ LoadPlugin vmem
 #	InterfaceFormat name
 #	PluginInstanceFormat name
 #</Plugin>
-
+{% endif %}
 #<Plugin vmem>
 #	Verbose false
 #</Plugin>
@@ -1385,6 +1436,9 @@ LoadPlugin vmem
 #    Host "localhost"
 #    Port "2003"
 #    Protocol "tcp"
+{% if installed_version|version_compare("5.5", ">=") %}
+#    ReconnectInterval 0
+{% endif %}
 #    LogSendErrors true
 #    Prefix "collectd"
 #    Postfix "collectd"
@@ -1395,6 +1449,17 @@ LoadPlugin vmem
 #</Plugin>
 
 #<Plugin write_http>
+{% if installed_version|version_compare("5.4", "<=") %}
+#	<URL "http://example.com/collectd-post">
+#		User "collectd"
+#		Password "weCh3ik0"
+#		VerifyPeer true
+#		VerifyHost true
+#		CACert "/etc/ssl/ca.crt"
+#		Format "Command"
+#		StoreRates false
+#	</URL>
+{% else %}
 #	<Node "example">
 #		URL "http://example.com/collectd-post"
 #		User "collectd"
@@ -1406,22 +1471,26 @@ LoadPlugin vmem
 #		ClientKey "/etc/ssl/client.pem"
 #		ClientCert "/etc/ssl/client.crt"
 #		ClientKeyPass "secret"
+#		Header "X-Custom-Header: custom_value"
 #		SSLVersion "TLSv1"
 #		Format "Command"
+#		Metrics true
+#		Notifications false
 #		StoreRates false
 #		BufferSize 4096
 #		LowSpeedLimit 0
 #		Timeout 0
 #	</Node>
+{% endif %}
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin write_kafka>
 #  Property "metadata.broker.list" "localhost:9092"
 #  <Topic "collectd">
 #    Format JSON
 #  </Topic>
 #</Plugin>
-
+{% endif %}
 #<Plugin write_mongodb>
 #	<Node "example">
 #		Host "localhost"
@@ -1439,6 +1508,9 @@ LoadPlugin vmem
 #		Host "localhost"
 #		Port "6379"
 #		Timeout 1000
+{% if installed_version|version_compare("5.5", ">=") %}
+#		Prefix "collectd/"
+{% endif %}
 #	</Node>
 #</Plugin>
 
@@ -1446,6 +1518,12 @@ LoadPlugin vmem
 #	<Node "example">
 #		Host "localhost"
 #		Port 5555
+{% if installed_version|version_compare("5.4", "<=") %}
+#		Protocol UDP
+#		StoreRates true
+#		AlwaysAppendDS false
+#		TTLFactor 2.0
+{% else %}
 #		Protocol TCP
 #		Batch true
 #		BatchMaxSize 8192
@@ -1455,11 +1533,14 @@ LoadPlugin vmem
 #		Notifications true
 #		CheckThresholds false
 #		EventServicePrefix ""
+{% endif %}
 #	</Node>
 #	Tag "foobar"
+{% if installed_version|version_compare("5.5", ">=") %}
 #	Attribute "foo" "bar"
+{% endif %}
 #</Plugin>
-
+{% if installed_version|version_compare("5.5", ">=") %}
 #<Plugin write_sensu>
 #	<Node "example">
 #		Host "localhost"
@@ -1492,7 +1573,7 @@ LoadPlugin vmem
 #    Host "localhost"
 #    Port "2181"
 #</Plugin>
-
+{% endif %}
 ##############################################################################
 # Filter configuration                                                       #
 #----------------------------------------------------------------------------#
