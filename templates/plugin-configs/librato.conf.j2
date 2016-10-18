@@ -1,0 +1,20 @@
+{% if use_librato|bool and collectd_forwarder is defined and collectd_forwarder == inventory_hostname %}
+LoadPlugin write_http
+<Plugin write_http>
+{% if installed_version|version_compare("5.4", "<=") %}
+  <URL "https://collectd.librato.com/v1/measurements">
+    User "{{ librato_email }}"
+    Password "{{ librato_token }}"
+    Format "JSON"
+  </URL>
+{% endif %}
+{% if installed_version|version_compare("5.5", ">=") %}
+  <Node "librato">
+    URL "https://collectd.librato.com/v1/measurements"
+    User "{{ librato_email }}"
+    Password "{{ librato_token }}"
+    Format "JSON"
+  </Node>
+{% endif %}
+</Plugin>
+{% endif %}

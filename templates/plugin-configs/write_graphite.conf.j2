@@ -1,0 +1,21 @@
+{% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
+{% if use_graphite|bool %}
+LoadPlugin python
+<LoadPlugin write_graphite>
+    Interval     {{ graphite_interval|default('10') }}
+</LoadPlugin>
+<Plugin write_graphite>
+  <Node "graphite">
+    Host "{{ graphite_host }}"
+    Port "{{ graphite_port }}"
+    Protocol "udp"
+    LogSendErrors true
+    Prefix "collectd"
+    Postfix "collectd"
+    StoreRates true
+    AlwaysAppendDS false
+    EscapeCharacter "_"
+  </Node>
+</Plugin>
+{% endif %}
+{% endif %}

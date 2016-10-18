@@ -24,31 +24,18 @@
     - files
     - configs
 
-- name: "Upload df plugin config"
+- name: "Upload plugin configs"
   template: >
-    src=df.conf.j2
-    dest={{ collectd_d_config_dir }}/df.conf
+    src=plugin-configs/{{ item }}.conf.j2
+    dest={{ collectd_d_config_dir }}/{{ item }}.conf
     mode=0644
+  with_items: collectd_plugins
   notify:
     - Restart collectd
   tags:
     - collectd
     - files
     - configs
-
-- name: "Upload Librato collectd config"
-  template: >
-    src=librato.conf.{{ installed_version }}.j2
-    dest=/etc/collectd.d/librato.conf
-    owner=root
-    group=root
-    mode=0644
-  when: use_librato|bool and collectd_forwarder is defined and collectd_forwarder == inventory_hostname
-  notify:
-    - Restart collectd
-  tags:
-    - collectd
-    - libs
 
 - name: "Install coretemp plugin for collectd"
   copy: >
@@ -65,7 +52,7 @@
 
 - name: "Install /etc/collectd.conf"
   template: >
-    src=collectd.conf.{{ installed_version }}.j2
+    src=collectd.conf.j2
     dest={{ collectd_config_dest }}
     mode=0644
   notify:

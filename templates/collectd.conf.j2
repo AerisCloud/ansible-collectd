@@ -1,0 +1,52 @@
+#
+# Config file for collectd(1).
+# Please read collectd.conf(5) for a list of options.
+# http://collectd.org/
+#
+
+##############################################################################
+# Global                                                                     #
+#----------------------------------------------------------------------------#
+# Global settings for the daemon.                                            #
+##############################################################################
+
+Hostname    "{{ server_hostname | default(inventory_hostname) }}"
+FQDNLookup   false
+#BaseDir     "/var/lib/collectd"
+#PIDFile     "/var/run/collectd.pid"
+#PluginDir   "/usr/lib64/collectd"
+#TypesDB     "/usr/share/collectd/types.db"
+
+#----------------------------------------------------------------------------#
+# When enabled, plugins are loaded automatically with the default options    #
+# when an appropriate <Plugin ...> block is encountered.                     #
+# Disabled by default.                                                       #
+#----------------------------------------------------------------------------#
+AutoLoadPlugin false
+{% if installed_version|version_compare("5.5", ">=") %}
+#----------------------------------------------------------------------------#
+# When enabled, internal statistics are collected, using "collectd" as the   #
+# plugin name.                                                               #
+# Disabled by default.                                                       #
+#----------------------------------------------------------------------------#
+#CollectInternalStats false
+{% endif %}
+#----------------------------------------------------------------------------#
+# Interval at which to query values. This may be overwritten on a per-plugin #
+# base by using the 'Interval' option of the LoadPlugin block:               #
+#   <LoadPlugin foo>                                                         #
+#       Interval 60                                                          #
+#   </LoadPlugin>                                                            #
+#----------------------------------------------------------------------------#
+Interval     {{ collectd_interval|default('60') }}
+{% if installed_version|version_compare("5.5", ">=") %}#MaxReadInterval 86400{% endif %}
+#Timeout         2
+#ReadThreads     5
+#WriteThreads    5
+
+# Limit the size of the write queue. Default is no limit. Setting up a limit is
+# recommended for servers handling a high volume of traffic.
+#WriteQueueLimitHigh 1000000
+#WriteQueueLimitLow   800000
+
+Include "/etc/collectd.d"

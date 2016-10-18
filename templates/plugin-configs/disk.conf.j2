@@ -1,0 +1,5 @@
+LoadPlugin disk
+<Plugin "disk">
+    Disk "/^{{ check_disk|default('xvde') }}/"
+    IgnoreSelected false
+</Plugin>
