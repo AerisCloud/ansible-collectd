@@ -76,23 +76,22 @@ collectd1.somedc.prod         ansible_ssh_host=10.0.1.111   private_ip=172.16.1.
 
 ### Plugin configuration
 
-The `collectd_load_plugins` variable defines the plugins to be loaded. Default plugins are below:
+The `collectd_plugins` variable defines the plugins to be loaded. Default plugins are below:
 
 ```
-LoadPlugin syslog
-LoadPlugin cpu
-LoadPlugin interface
-LoadPlugin load
-LoadPlugin memory
-LoadPlugin vmem
-LoadPlugin swap
-LoadPlugin disk
-LoadPlugin rrdtool
-LoadPlugin network
-LoadPlugin python
-LoadPlugin librato
-LoadPlugin exec
-LoadPlugin write_graphite
+  - syslog
+  - cpu
+  - interface
+  - load
+  - memory
+  - vmem
+  - swap
+  - disk
+  - rrdtool
+  - network
+  - librato
+  - exec
+  - write_graphite
 ```
   
 

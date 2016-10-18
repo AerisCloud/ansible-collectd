@@ -15,7 +15,6 @@ collectd_plugins:
   - disk
   - rrdtool
   - network
-  - python
   - librato
   - exec
   - write_graphite

@@ -1,4 +1,6 @@
-{% if use_graphite|bool and collectd_forwarder is defined and collectd_forwarder == inventory_hostname %}
+{% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
+{% if use_graphite|bool %}
+LoadPlugin python
 <LoadPlugin write_graphite>
     Interval     {{ graphite_interval|default('10') }}
 </LoadPlugin>
@@ -15,4 +17,5 @@
     EscapeCharacter "_"
   </Node>
 </Plugin>
+{% endif %}
 {% endif %}
