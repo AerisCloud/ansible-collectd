@@ -1,11 +1,12 @@
+{% if collectd_forwarder != '' %}
 LoadPlugin network
 <Plugin network>
-    {% if collectd_forwarder is defined and collectd_forward_to_logstash|bool %}
+    {% if collectd_forward_to_logstash|bool %}
         <Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25827">
                 Interface "{{ private_interface }}"
         </Server>
         TimeToLive 128
-    {% elif collectd_forwarder is defined and collectd_forwarder != inventory_hostname %}
+    {% elif collectd_forwarder != inventory_hostname %}
         <Server "{{ hostvars[collectd_forwarder]['private_ip']|default(hostvars[collectd_forwarder]['ansible_ssh_host']) }}" "25826">
                 Interface "{{ private_interface }}"
         </Server>
@@ -19,3 +20,4 @@ LoadPlugin network
         # statistics about the network plugin itself
         ReportStats false
 </Plugin>
+{% endif %}

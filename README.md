@@ -26,6 +26,9 @@ By default, we will save all metrics to RRD files under `/var/lib/collectd/rrd/$
 Normally, we put all aggregation on a single machine.
 However, it is possible to decouple them, and provision separate machines for any aggregators we might have.
 This example demonstrate how to create a dedicated collectd aggregator.
+`collectd_forwarder` defines the host that is the dedicated collectd aggregator. Default is an empty string, '',
+which configures the network plugin to not send to a collectd aggregator.
+
 
 ```ini
 [collectd:children]
@@ -69,7 +72,7 @@ The following may also be added to your inventory.
 * `collectd_df_ValuesAbsolute`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: true)
 * `collectd_df_ValuesPercentage`: [see wiki](https://collectd.org/wiki/index.php/Plugin:DF#Parameters) (default: false)
 * `monitor_coretemp`: set to true if you want to monitor coretemp (only useful on real hardware)
-* `private_ip`: set to the IP address of the `collectd_forwarder` if `collectd_fowarder` has multiple IPs. Example:
+* `private_ip`: set to the IP address of the `collectd_forwarder` if `collectd_forwarder` has multiple IPs. Example:
 ```
 collectd1.somedc.prod         ansible_ssh_host=10.0.1.111   private_ip=172.16.1.111
 ```

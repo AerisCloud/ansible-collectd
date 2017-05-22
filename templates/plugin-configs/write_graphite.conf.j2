@@ -1,4 +1,4 @@
-{% if collectd_forwarder is defined and collectd_forwarder == inventory_hostname  %}
+{% if collectd_forwarder == inventory_hostname  %}
 {% if use_graphite|bool %}
 LoadPlugin python
 <LoadPlugin write_graphite>
