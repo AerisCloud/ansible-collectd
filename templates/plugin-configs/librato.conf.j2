@@ -1,4 +1,5 @@
-{% if use_librato|bool and collectd_forwarder is defined and collectd_forwarder == inventory_hostname %}
+{% if use_librato|bool %}
+{% if (collectd_forwarder == inventory_hostname) or (collectd_forwarder == '') %}
 LoadPlugin write_http
 <Plugin write_http>
 {% if installed_version|version_compare("5.4", "<=") %}
@@ -17,4 +18,5 @@ LoadPlugin write_http
   </Node>
 {% endif %}
 </Plugin>
+{% endif %}
 {% endif %}
