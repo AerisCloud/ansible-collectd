@@ -75,7 +75,7 @@
 - name: "Make sure collectd is running"
   service: >
     name=collectd
-    state=running
+    state=started
     enabled=yes
     runlevel=5
   tags:
