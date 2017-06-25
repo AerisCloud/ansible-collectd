@@ -29,7 +29,7 @@
     src=plugin-configs/{{ item }}.conf.j2
     dest={{ collectd_d_config_dir }}/{{ item }}.conf
     mode=0644
-  with_items: collectd_plugins
+  with_items: "{{ collectd_plugins }}"
   notify:
     - Restart collectd
   tags:
@@ -75,7 +75,7 @@
 - name: "Make sure collectd is running"
   service: >
     name=collectd
-    state=running
+    state=started
     enabled=yes
     runlevel=5
   tags:
