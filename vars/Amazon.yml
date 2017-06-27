@@ -1,0 +1,24 @@
+packages:
+  - collectd
+  - collectd-amqp
+  - collectd-apache
+  - collectd-bind
+  - collectd-curl
+  - collectd-curl_xml
+  - collectd-dbi
+  - collectd-dns
+  - collectd-email
+  - collectd-generic-jmx
+  - collectd-ipmi
+  - collectd-iptables
+  - collectd-ipvs
+  - collectd-java
+  - collectd-lvm
+  - collectd-mysql
+  - collectd-netlink
+  - collectd-nginx
+  - collectd-notify_email
+  - collectd-postgresql
+  - collectd-rrdcached
+  - collectd-rrdtool
+  - collectd-snmp
